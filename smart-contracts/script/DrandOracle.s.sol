@@ -11,14 +11,20 @@ contract DrandOracleScript is Script {
 
     function setUp() public {}
 
+    // function run() public {
+    //     vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+    //     DrandOracle drandOracle = new DrandOracle(DELAY, TIMEOUT);
+    //     drandOracle.setRandom("96251444dd653d2976369504b1d07b334aca2a4994b8463e9f754e5ce052762b", 42);
+    //     string memory random = drandOracle.getRandom(42);
+    //     console.log("random: ", random);
+    //     string memory randomTwo = drandOracle.getRandom(40);
+    //     console.log("randomTwo: ", randomTwo);
+    //     vm.stopBroadcast();
+    // }
+
     function run() public {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        DrandOracle drandOracle = new DrandOracle(DELAY, TIMEOUT);
-        drandOracle.setRandom("96251444dd653d2976369504b1d07b334aca2a4994b8463e9f754e5ce052762b", 42);
-        string memory random = drandOracle.getRandom(42);
-        console.log("random: ", random);
-        string memory randomTwo = drandOracle.getRandom(40);
-        console.log("randomTwo: ", randomTwo);
+        new DrandOracle(DELAY, TIMEOUT);
         vm.stopBroadcast();
     }
 }

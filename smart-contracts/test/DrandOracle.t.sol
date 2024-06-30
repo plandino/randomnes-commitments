@@ -51,7 +51,7 @@ contract DrandOracleTest is Test {
         assertEq(drandOracle.getRandom(validTimestamp), validRandom);
     }
 
-    function test_GetRandomAtInvalidtimestampReverts(uint256 anothertimestamp) public {
+    function test_GetRandomAtInvalidTimestampReverts(uint256 anothertimestamp) public {
         // Set up
         drandOracle.setRandom(validRandom, validTimestamp);
 

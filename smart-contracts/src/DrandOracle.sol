@@ -45,6 +45,10 @@ contract DrandOracle {
      * @param timestamp {uint256} - timestamp for which random is requested
      */
     function unsafeGetRandom(uint256 timestamp) view public returns (string memory) {
+        // If random is not set, return 0
+        if(bytes(randoms[timestamp]).length == 0){
+            return "0";
+        }
         return randoms[timestamp];
     }
 
