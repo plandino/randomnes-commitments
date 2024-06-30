@@ -39,7 +39,7 @@ contract RandomnessOracle {
      * @param timeStamp {uint256 timestamp} - timestamp to verify
      * @return {bool} - true if random will be available at the given timestamp (previous or future)
      */ 
-    function isRandomeAvailable(uint256 timeStamp) public view returns(bool) {
+    function isRandomAvailable(uint256 timeStamp) public view returns(bool) {
         return drandOracle.isRandomAvailable(timeStamp) && sequencerRandomOracle.isRandomAvailable(timeStamp);
     }
 }

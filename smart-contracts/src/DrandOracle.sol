@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
+import { console } from "forge-std/Console.sol";
 
 contract DrandOracle {
     address public owner;
@@ -13,37 +14,63 @@ contract DrandOracle {
         setTimeout(timeout);
     }
 
+    /**
+     * Sets random at given timestamp
+     * Random can be set only once and cannot be set after TIMEOUT and DELAY
+     * @param random {string} the random which should be 64 bytes long
+     * @param timeStamp {uint256} the timestamp
+     */
     function setRandom(string calldata random, uint256 timeStamp) public {
+        // Verify that the random is 64 bytes long
+        require(bytes(random).length == 64, "Random should be 64 bytes long");
+        // Verify that the random is not set after TIMEOUT and DELAY
+        require(timeStamp < block.timestamp + DRAND_TIMEOUT + DELAY, "Random should be set before timeout and delay");
+        // Verify that the random is not set twice
+        require(bytes(randoms[timeStamp]).length == 0, "Random can not be set twice");
         randoms[timeStamp] = random;
     }
 
+    /**
+     * Returns the random for the given timestamp. Reverts if random is not available.
+     * Reverts if random is not available.
+     * @param blockTimeStamp {uint256} - timestamp for which random is requested
+     */
     function getRandom(uint256 blockTimeStamp) view public returns (string memory) {
+        require(bytes(randoms[blockTimeStamp]).length != 0, "Random not available");
         return randoms[blockTimeStamp];
     }
 
-    function currentBlockTimeStamp() view public returns (uint256) {
-        return block.timestamp;
+    /**
+     * Returns the random for the given timestamp. Returns 0 if the random is not available.
+     * @param timestamp {uint256} - timestamp for which random is requested
+     */
+    function unsafeGetRandom(uint256 timestamp) view public returns (string memory) {
+        return randoms[timestamp];
     }
 
-    function setDelay(uint8 delay) internal onlyOwner {
+    /**
+     * Set the delay for which the random can be set. Can be set only by the owner
+     * @param delay {uint8} - delay in seconds
+     */
+    function setDelay(uint8 delay) public onlyOwner {
         DELAY = delay;
     }
 
-    function setTimeout(uint8 timeout) internal onlyOwner {
+    /**
+     * Set the timeout for which the random can be set. Can be set only by the owner
+     * @param timeout {uint8} - timeout in seconds
+     */
+    function setTimeout(uint8 timeout) public onlyOwner {
         DRAND_TIMEOUT = timeout;
     }
 
     /**
-     * Checks if the random is available at the given timestamp
-     * Verifies if the random 
+     * Checks if the random is available at a given timestamp. This could be a past or future timestamp
      * @param timeStamp {uint256} - timestamp to verify if random is or could be available
      */
     function isRandomAvailable(uint256 timeStamp) view public returns (bool) {
-        // Get the random string from the timestamp
-        string memory random = randoms[timeStamp];
-
         // If there is a random for the specified timestamp then it available
-        if (bytes(random).length != 0) {
+        if (bytes(randoms[timeStamp]).length != 0) {
             return true;
         }
 

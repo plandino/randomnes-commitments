@@ -54,12 +54,9 @@ contract SequencerRandomOracle {
         return randoms[timeStamp];
     }
 
-    function isRandomeAvailable(uint256 timeStamp) view public returns (bool) {
-        // Get the random string from the timestamp
-        string memory random = randoms[timeStamp];
-
+    function isRandomAvailable(uint256 timeStamp) view public returns (bool) {
         // If there is a random for the specified random then it is available
-        if (bytes(random).length != 0) {
+        if (bytes(randoms[timeStamp]).length != 0) {
             return true;
         }
 
