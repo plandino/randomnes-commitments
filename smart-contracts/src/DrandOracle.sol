@@ -8,6 +8,13 @@ contract DrandOracle {
     uint8 public DELAY;
     mapping (uint256 => string) public randoms;
 
+    event RandomSet(string random, uint256 timestamp);
+
+    error ErrorRandomNotAvailable(uint256 timestamp);
+    error ErrorRandomSetAfterTimeout(string random, uint256 timestamp);
+    error ErrorRandomSetTwice(string random, uint256 timestamp);
+    error ErrorRandomInvalidFormat(string random, uint256 timestamp);
+
     constructor(uint8 delay, uint8 timeout) {
         owner = msg.sender;
         setDelay(delay);
@@ -18,26 +25,47 @@ contract DrandOracle {
      * Sets random at given timestamp
      * Random can be set only once and cannot be set after TIMEOUT and DELAY
      * @param random {string} the random which should be 64 bytes long
-     * @param timeStamp {uint256} the timestamp
+     * @param timestamp {uint256} the timestamp
      */
-    function setRandom(string calldata random, uint256 timeStamp) public {
+    function setRandom(string calldata random, uint256 timestamp) public {
         // Verify that the random is 64 bytes long
         require(bytes(random).length == 64, "Random should be 64 bytes long");
-        // Verify that the random is not set after TIMEOUT and DELAY
-        require(timeStamp < block.timestamp + DRAND_TIMEOUT + DELAY, "Random should be set before timeout and delay");
+        // if (bytes(random).length != 64) {
+        //     revert ErrorRandomInvalidFormat(random, timestamp);
+        // }
+
+        // Verify that the random is not set after TIMEOUT and DELAY have passed
+        require(timestamp > block.timestamp - DRAND_TIMEOUT - DELAY, "Random should be set before timeout and delay");
+        
+        // Verify that the random is not set in the future
+        require(timestamp <= block.timestamp, "Cannot set a random in the future");
+        // if (timestamp < block.timestamp + DRAND_TIMEOUT + DELAY) {
+        //     revert ErrorRandomSetAfterTimeout(random, timestamp);
+        // }
+
         // Verify that the random is not set twice
-        require(bytes(randoms[timeStamp]).length == 0, "Random can not be set twice");
-        randoms[timeStamp] = random;
+        require(bytes(randoms[timestamp]).length == 0, "Random can not be set twice");
+        // if (bytes(randoms[timestamp]).length != 0) {
+        //     revert ErrorRandomSetTwice(random, timestamp);
+        // }
+
+        randoms[timestamp] = random;
+
+        emit RandomSet(random, timestamp);
     }
 
     /**
      * Returns the random for the given timestamp. Reverts if random is not available.
      * Reverts if random is not available.
-     * @param blockTimeStamp {uint256} - timestamp for which random is requested
+     * @param timestamp {uint256} - timestamp for which random is requested
      */
-    function getRandom(uint256 blockTimeStamp) view public returns (string memory) {
-        require(bytes(randoms[blockTimeStamp]).length != 0, "Random not available");
-        return randoms[blockTimeStamp];
+    function getRandom(uint256 timestamp) view public returns (string memory) {
+        require(bytes(randoms[timestamp]).length != 0, "Random not available");
+        // if (bytes(randoms[timestamp]).length == 0) {
+        //     revert ErrorRandomNotAvailable(timestamp);
+        // }
+
+        return randoms[timestamp];
     }
 
     /**
@@ -70,16 +98,16 @@ contract DrandOracle {
 
     /**
      * Checks if the random is available at a given timestamp. This could be a past or future timestamp
-     * @param timeStamp {uint256} - timestamp to verify if random is or could be available
+     * @param timestamp {uint256} - timestamp to verify if random is or could be available
      */
-    function isRandomAvailable(uint256 timeStamp) view public returns (bool) {
+    function isRandomAvailable(uint256 timestamp) view public returns (bool) {
         // If there is a random for the specified timestamp then it available
-        if (bytes(randoms[timeStamp]).length != 0) {
+        if (bytes(randoms[timestamp]).length != 0) {
             return true;
         }
 
         // If the random string is empty, and DRAND_TIMEOUT and DELAY has passed then the random is expired
-        return timeStamp < block.timestamp + DRAND_TIMEOUT + DELAY;
+        return timestamp < block.timestamp + DRAND_TIMEOUT + DELAY;
     }
 
     modifier onlyOwner() {
