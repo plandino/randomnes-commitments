@@ -13,7 +13,7 @@ Writes commitments and randomnesses to an on-chain oracle. It is composed of two
 
 2. Copy the `.env.example` in the monorepo root folder to `.env` (also in monorepo root folder) and fill with your own `RPC_URL` and `PRIVATE_KEY`.
 
-> The **RPC_URL** should target Ethereum Sepolia and the **PRIVATE_KEY** wallet should have some test ETH to post the transactions to the blockchin.
+> ❗ The **RPC_URL** should target Ethereum Sepolia and the **PRIVATE_KEY** wallet should have some test ETH to post the transactions to the blockchin.
 
 3. Run script that writes randoms to the DrandOracle
 
@@ -27,15 +27,20 @@ The backend already has an address of the DrandOracle deployed on Ethereum Sepol
 ## How to run the smart contracts
 
 1. Install dependencies:
-`cd smart-contracts && yarn install`
+
+    `cd smart-contracts && yarn install`
+
 2. Set the env vars
-`export $PRIVATE_KEY=*** (your private key)`
-`export $RPC_URL=***      (your rpc url key)`
+
+    `export $PRIVATE_KEY=*** (your private key)`
+    `export $RPC_URL=***      (your rpc url key)`
+
 2. Deploy the DrandOracle:
 
     `forge script script/DrandOracle.s.sol --private-key $PRIVATE_KEY --fork-url $RPC_URL --broadcast`
 
 3. (optional) Run tests 
-`forge test`
+
+    `forge test`
 
 
