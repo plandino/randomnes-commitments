@@ -30,21 +30,27 @@ contract DrandOracle {
     function setRandom(string calldata random, uint256 timestamp) public {
         // Verify that the random is 64 bytes long
         require(bytes(random).length == 64, "Random should be 64 bytes long");
+        // Implemented first version with require, but prefer to use revert error. 
+        // TODO: Change the tests to interpret the revert error message
         // if (bytes(random).length != 64) {
         //     revert ErrorRandomInvalidFormat(random, timestamp);
         // }
 
         // Verify that the random is not set after TIMEOUT and DELAY have passed
-        require(timestamp > block.timestamp - DRAND_TIMEOUT - DELAY, "Random should be set before timeout and delay");
+        require(timestamp >= block.timestamp - DRAND_TIMEOUT - DELAY, "Random should be set before timeout and delay");
         
         // Verify that the random is not set in the future
         require(timestamp <= block.timestamp, "Cannot set a random in the future");
+        // Implemented first version with require, but prefer to use revert error. 
+        // TODO: Change the tests to interpret the revert error message
         // if (timestamp < block.timestamp + DRAND_TIMEOUT + DELAY) {
         //     revert ErrorRandomSetAfterTimeout(random, timestamp);
         // }
 
         // Verify that the random is not set twice
         require(bytes(randoms[timestamp]).length == 0, "Random can not be set twice");
+        // Implemented first version with require, but prefer to use revert error. 
+        // TODO: Change the tests to interpret the revert error message
         // if (bytes(randoms[timestamp]).length != 0) {
         //     revert ErrorRandomSetTwice(random, timestamp);
         // }
@@ -61,6 +67,8 @@ contract DrandOracle {
      */
     function getRandom(uint256 timestamp) view public returns (string memory) {
         require(bytes(randoms[timestamp]).length != 0, "Random not available");
+        // Implemented first version with require, but prefer to use revert error. 
+        // TODO: Change the tests to interpret the revert error message
         // if (bytes(randoms[timestamp]).length == 0) {
         //     revert ErrorRandomNotAvailable(timestamp);
         // }

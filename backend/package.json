@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "dev": "nodemon --watch '**/*.ts' --exec 'ts-node' src/app.ts",
+    "dev_listener": "nodemon --watch '**/*.ts' --exec 'ts-node' src/blockListener.ts",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
